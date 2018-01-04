@@ -1,0 +1,36 @@
+config system
+        option hostname 'LEDE'
+        option timezone 'UTC'
+        option ttylogin '0'
+        option log_size '64'
+        option urandom_seed '0'
+
+config timeserver 'ntp'
+        option enabled '1'
+        option enable_server '0'
+        list server '0.lede.pool.ntp.org'
+        list server '1.lede.pool.ntp.org'
+        list server '2.lede.pool.ntp.org'
+        list server '3.lede.pool.ntp.org'
+
+config led 'led_wifi_led'
+        option name 'wifi'
+        option sysfs 'gl-mt300n-v2:green:wlan'
+        option trigger 'netdev'
+        option mode 'link tx rx'
+        option dev 'ra0'
+        option default '0'
+
+config led
+        option name 'sd'
+        option sysfs 'gl-mt300n-v2:green:sd'
+        option default '1'
+        option trigger 'mmc0'
+
+config led
+        option default '0'
+        option name 'usb'
+        option sysfs 'gl-mt300n-v2:green:usb'
+        option trigger 'usbport'
+        list port 'usb1-port1'
+        list port 'usb2-port1'

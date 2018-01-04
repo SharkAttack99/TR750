@@ -1,0 +1,30 @@
+#!/bin/sh
+
+all_led_on() {
+        echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:power/brightness
+        echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:wan/brightness
+        echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:sd/brightness
+        echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:wlan/brightness
+        echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:usb/brightness
+        echo 1 > /sys/class/leds/gl-mt300n-v2\:red\:low_bat/brightness
+}
+
+all_led_off() {
+		ifconfig rai0 down >/dev/null 2>&1
+        echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:power/brightness
+        echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:wan/brightness
+        echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:sd/brightness
+        echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:wlan/brightness
+        echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:usb/brightness
+        echo 0 > /sys/class/leds/gl-mt300n-v2\:red\:low_bat/brightness
+}
+
+case $1 in
+        'on')
+        all_led_on
+        ;;
+        'off')
+        all_led_off
+        ;;
+esac
+

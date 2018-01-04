@@ -1,0 +1,49 @@
+#!/bin/sh
+
+power_led_state() {
+        local state="$1"
+        if [ "$state"x == "on"x ];then
+                echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:power/brightness
+        else
+                echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:power/brightness
+        fi
+}
+
+low_bat_led_state() {
+        local state="$1"
+        if [ "$state"x == "on"x ];then
+                echo 1 > /sys/class/leds/gl-mt300n-v2\:red\:low_bat/brightness
+        else
+                echo 0 > /sys/class/leds/gl-mt300n-v2\:red\:low_bat/brightness
+        fi
+}
+
+led_init() {
+        power_led_state on
+        low_bat_led_state off
+}
+
+led_revert() {
+        power_led_state off
+        low_bat_led_state on
+}
+
+hex2oct() {
+        printf "%d" "$1"
+}
+
+led_init
+
+while true;do
+        electricitybill_hex=`i2cget -y -f 0 0x55 0x20 w`
+        electricitybill_oct=$(hex2oct $electricitybill_hex)
+
+        if [ "$electricitybill_oct" -lt 8 ];then
+                led_revert
+                if [  "$electricitybill_oct" -lt 5 ];then
+                        /sbin/poweroff
+                fi
+        fi
+
+        sleep 60
+done

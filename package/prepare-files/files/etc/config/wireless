@@ -1,0 +1,39 @@
+config wifi-device      mt7610e
+        option type     mt7610e
+        option vendor   ralink
+        option band     5G
+        option channel  auto
+        option auotch   2
+        option bw       2
+        option ht_gi    1
+        option country  CN
+        option aregion  4
+
+config wifi-iface	mt7610eiface
+        option device   mt7610e
+        option ifname   rai0
+        option network  lan
+        option mode     ap
+        option ssid     TETON-5G
+		option encryption psk-mixed
+		option key      goodlife
+
+config wifi-device      mt7628
+        option type     mt7628
+        option vendor   ralink
+        option band     2.4G
+        option channel  auto
+        option bw       1
+        option country  CN
+        option region  1
+        option autoch_skip "12;13"
+
+config wifi-iface	mt7628iface
+        option device   mt7628
+        option ifname   ra0
+        option network  lan
+        option mode     ap
+        option ssid     TETON-2.4G
+		option encryption psk2
+		option key      goodlife
+
