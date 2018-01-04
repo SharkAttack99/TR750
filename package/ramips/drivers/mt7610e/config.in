@@ -27,6 +27,7 @@ config MT7610_AP_V24_DATA_STRUCTURE
 config  MT7610_AP_LED
 	bool "LED Support"
 	depends on MT7610_AP
+    default y
 
 config  MT7610_AP_WSC
 	bool "WSC (WiFi Simple Config)"

@@ -4,6 +4,7 @@ config MT_WIFI
 	select WIFI_BASIC_FUNC if MT_WIFI
 	select RALINK_MT7628
 	select MT7628
+	default y
 
 config RALINK_MT7628
 	bool

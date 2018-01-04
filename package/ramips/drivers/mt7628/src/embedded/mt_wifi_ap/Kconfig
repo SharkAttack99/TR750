@@ -29,12 +29,14 @@ config MT7628_ENHANCE_NEW_MBSSID_MODE
 config MT7628_APCLI_SUPPORT
 	bool "AP-Client Support"
 	depends on MT7628_AP_SUPPORT
+	default y
+
 
 config MT7628_MAC_REPEATER_SUPPORT
 	bool "MAC Repeater Support"
 	depends on MT7628_AP_SUPPORT
 	depends on MT7628_APCLI_SUPPORT
-	default n
+	default y
 
 config MT7628_DOT11R_FT_SUPPORT
 	bool "802.11r Fast BSS Transition"
