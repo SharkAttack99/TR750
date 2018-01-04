@@ -32,7 +32,7 @@ define KernelPackage/mt7628
   FILES:=$(PKG_BUILD_DIR)/build/mt7628.ko
   AUTOLOAD:=$(call AutoLoad,90,mt7628)
   SUBMENU:=Drivers
-  DEPENDS:=+kmod-rt-flash +kmod-mac80211
+  DEPENDS:=+kmod-mac80211
   MENU:=1
 endef
 
