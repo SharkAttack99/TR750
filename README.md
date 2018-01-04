@@ -32,6 +32,7 @@ Target Profile --->
 
 Global build settings --->
 	[*] basic package
+	[*] include Luci
 	[*] support USB storage and sharing
 
 Kernel modules --->
