@@ -18,6 +18,7 @@ define KernelPackage/bq27510-i2c
   TITLE:=BQ27510 update Data flash stream support
   FILES:=$(PKG_BUILD_DIR)/bq27510-i2c.ko
   KCONFIG:=
+  DEPENDS:=kmod-i2c-core
 endef
 
 define KernelPackage/bq27510-i2c/description
