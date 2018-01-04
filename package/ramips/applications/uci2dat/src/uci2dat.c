@@ -100,9 +100,20 @@ typedef struct _vif
 	/*apcli*/
 	param apcli_enable;
 	param apcli_ssid;
+	param apcli_bssid;
 	param apcli_authmode;
 	param apcli_encryptype;
 	param apcli_password;
+
+    /*access policy*/
+    param AccessPolicy0;
+    param AccessControlList0;
+    param AccessPolicy1;
+    param AccessControlList1;
+    param AccessPolicy2;
+    param AccessControlList2;
+    param AccessPolicy3;
+    param AccessControlList3;
 } vif;
 
 typedef struct
@@ -145,9 +156,20 @@ vif VIF =
 	/* ap-clinet */
 	.apcli_enable	    = {NULL, "ApCliEnable", {0}, NULL, NULL},
 	.apcli_ssid         = {NULL, "ApCliSsid", {0}, NULL, NULL},
+	.apcli_bssid        = {NULL, "ApCliBssid", {0}, NULL, NULL},
 	.apcli_authmode     = {NULL, "ApCliAuthMode", {0}, NULL, NULL},
 	.apcli_encryptype   = {NULL, "ApCliEncrypType", {0}, NULL, NULL},
 	.apcli_password     = {NULL, "ApCliWPAPSK", {0}, NULL, NULL},
+
+    /**/
+    .AccessPolicy0      = {NULL, "AccessPolicy0", {0}, NULL, NULL},
+    .AccessControlList0 = {NULL, "AccessControlList0", {0}, NULL, NULL},
+    .AccessPolicy1      = {NULL, "AccessPolicy1", {0}, NULL, NULL},
+    .AccessControlList1 = {NULL, "AccessControlList1", {0}, NULL, NULL},
+    .AccessPolicy2      = {NULL, "AccessPolicy2", {0}, NULL, NULL},
+    .AccessControlList2 = {NULL, "AccessControlList2", {0}, NULL, NULL},
+    .AccessPolicy3      = {NULL, "AccessPolicy3", {0}, NULL, NULL},
+    .AccessControlList3 = {NULL, "AccessControlList3", {0}, NULL, NULL},
 };
 
 param CFG_ELEMENTS[] =
@@ -242,14 +264,14 @@ param CFG_ELEMENTS[] =
     {"Key4Str2", NULL, {0}, hooker, NULL},
     {"Key4Str3", NULL, {0}, hooker, NULL},
     {"Key4Str4", NULL, {0}, hooker, NULL},
-    {"AccessPolicy0", NULL, {0}, NULL, "0"},
-    {"AccessControlList0", NULL, {0}, NULL, NULL},
-    {"AccessPolicy1", NULL, {0}, NULL, "0"},
-    {"AccessControlList1", NULL, {0}, NULL, NULL},
-    {"AccessPolicy2", NULL, {0}, NULL, "0"},
-    {"AccessControlList2", NULL, {0}, NULL, NULL},
-    {"AccessPolicy3", NULL, {0}, NULL, "0"},
-    {"AccessControlList3", NULL, {0}, NULL, NULL},
+    {"AccessPolicy0", NULL, {0}, hooker, "0"},
+    {"AccessControlList0", NULL, {0}, hooker, NULL},
+    {"AccessPolicy1", NULL, {0}, hooker, "0"},
+    {"AccessControlList1", NULL, {0}, hooker, NULL},
+    {"AccessPolicy2", NULL, {0}, hooker, "0"},
+    {"AccessControlList2", NULL, {0}, hooker, NULL},
+    {"AccessPolicy3", NULL, {0}, hooker, "0"},
+    {"AccessControlList3", NULL, {0}, hooker, NULL},
     {"WdsEnable", "wds_enable", {0}, hooker, "0"},
     {"WdsEncrypType", "wds_enctype", {0}, hooker, "NONE"},
     {"WdsList", NULL, {0}, NULL, NULL},
@@ -664,9 +686,21 @@ void parse_uci(char * arg)
 			/*AP-CLIENT*/
 			PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].apcli_enable, value);
 			PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].apcli_ssid, value);
+			PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].apcli_bssid, value);
 			PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].apcli_authmode, value);
 			PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].apcli_encryptype, value);
 			PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].apcli_password, value);
+
+            /**/
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessPolicy0, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessControlList0, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessPolicy1, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessControlList1, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessPolicy2, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessControlList2, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessPolicy3, value);
+            PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].AccessControlList3, value);
+            
 #if 0
             PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].authmode, value);
             PARSE_UCI_OPTION(wifi_cfg[cur_dev].vifs[cur_vif].cipher, value);
@@ -1067,6 +1101,10 @@ void hooker(FILE * fp, param * p, const char * devname)
 	{
 		FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].apcli_ssid.value);
 	}
+	else if (0 == strmatch(p->dat_key, "ApCliBssid"))
+	{
+		FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].apcli_bssid.value);
+	}
 	else if (0 == strmatch(p->dat_key, "ApCliAuthMode"))
 	{
 		FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].apcli_authmode.value);
@@ -1079,6 +1117,39 @@ void hooker(FILE * fp, param * p, const char * devname)
 	{
 		FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].apcli_password.value);
 	}
+    /**/
+    else if (0 == strmatch(p->dat_key, "AccessPolicy0"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessPolicy0.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessControlList0"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessControlList0.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessPolicy1"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessPolicy1.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessControlList1"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessControlList1.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessPolicy2"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessPolicy2.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessControlList2"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessControlList2.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessPolicy3"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessPolicy3.value);
+    }
+    else if (0 == strmatch(p->dat_key, "AccessControlList3"))
+    {
+        FPRINT(fp, p, "%s", wifi_cfg[N].vifs[i].AccessControlList3.value);
+    }
     /* the rest part is quite simple! */
     else
     {
