@@ -35,6 +35,9 @@ Global build settings --->
 	[*] include Luci
 	[*] support USB storage and sharing
 
+Base system --->
+	<*> wireless-tools
+
 Kernel modules --->
 	I2C support --->
 		<*> kmod-i2c-algo-bit
