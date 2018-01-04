@@ -61,6 +61,7 @@ platform_check_image() {
 	gl-mt300a|\
 	gl-mt300n|\
 	gl-mt750|\
+	gl-mt750-v2|\
 	hc5*61|\
 	hg255d|\
 	hlk-rm04|\

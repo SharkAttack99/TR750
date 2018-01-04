@@ -1,0 +1,188 @@
+/dts-v1/;
+
+#include "mt7628an.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/{
+	compatible = "gl-inet,gl-mt750-v2", "ralink,mt7628an-soc";
+	model = "GL-MT750-V2";
+
+	chosen {
+		bootargs = "console=ttyS0,115200";
+	};
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x8000000>;
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+
+		power {
+			label = "gl-mt750-v2:green:power";
+			default-state = "on";
+			gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+		};
+
+		wan {
+			label = "gl-mt750-v2:green:wan";
+			gpios = <&gpio0 3 GPIO_ACTIVE_LOW>;
+		};
+
+		wlan {
+			label = "gl-mt750-v2:green:wlan";
+			gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
+		};
+
+		sd {
+			label = "gl-mt750-v2:green:sd";
+			default-state = "on";
+			gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
+		};
+
+		usb {
+			label = "gl-mt750-v2:green:usb";
+			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+		};
+
+		low_bat {
+			label = "gl-mt750-v2:red:low_bat";
+			gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys-polled";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		poll-interval = <20>;
+
+		reset {
+			label = "reset";
+			gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+
+		BTN_0 {
+			label = "BTN_0";
+			gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
+			linux,code = <BTN_0>;
+		};
+	};
+
+	gpio-poweroff {
+		compatible = "gpio-poweroff";
+		gpios = <&gpio1 11 GPIO_ACTIVE_LOW>;
+	};
+
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+
+		usbpow {
+			gpio-export,name = "usbpow";
+			gpio-export,output = <1>;
+			gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
+		};
+	};
+};
+
+&pinctrl {
+	state_default: pinctrl0 {
+		gpio {
+			ralink,group = "i2s", "perst", "gpio", "wled_an", "p0led_an","p1led_an", "p2led_an", "p3led_an", "p4led_an";
+			ralink,function = "gpio";
+		};
+	};
+};
+
+&i2c {
+	status = "okay";
+
+	clock-frequency = <50000>;
+
+	bq27510@55 {
+		compatible = "bq27510";
+		reg = <0x55>;
+	};
+
+	bq25890@6a {
+		compatible = "bq25890";
+		reg = <0x6a>;
+	};
+};
+
+&ethernet {
+	mtd-mac-address = <&factory 0x4>;
+};
+
+&wmac {
+	status = "okay";
+
+	mtd-mac-address = <&factory 0x4>;
+	mediatek,mtd-eeprom = <&factory 0x0000>;
+};
+
+&pcie {
+	status = "okay";
+
+	pcie-bridge {
+		mtd-mac-address = <&factory 0x8004>;
+		mediatek,mtd-eeprom = <&factory 0x8000>;
+	};
+}
+
+&spi0 {
+	status = "okay";
+
+	m25p80@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+		m25p,chunked-io = <32>;
+
+		partition@0 {
+			label = "u-boot";
+			reg = <0x0 0x30000>;
+			read-only;
+		};
+
+		partition@30000 {
+			label = "u-boot-env";
+			reg = <0x30000 0x10000>;
+			read-only;
+		};
+
+		factory: partition@40000 {
+			label = "factory";
+			reg = <0x40000 0x10000>;
+			read-only;
+		};
+
+		partition@50000 {
+			label = "firmware";
+			reg = <0x50000 0xfb0000>;
+		};
+	};
+};
+
+&sdhci {
+	status = "okay";
+};
+
+&ehci {
+	status = "okay";
+};
+
+&ohci {
+	status = "okay";
+};
+
+&esw {
+	mediatek,portmap = "wllll";
+};

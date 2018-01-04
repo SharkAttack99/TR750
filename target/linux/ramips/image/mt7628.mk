@@ -56,3 +56,11 @@ define Device/mac1200r-v2
   SUPPORTED_DEVICES := mac1200rv2
 endef
 TARGET_DEVICES += mac1200r-v2
+
+define Device/gl-mt750-v2
+  DTS := GL-MT750-V2
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  DEVICE_TITLE := GL-iNet GL-MT750-V2
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci kmod-usb-ledtrig-usbport
+endef
+TARGET_DEVICES += gl-mt750-v2
