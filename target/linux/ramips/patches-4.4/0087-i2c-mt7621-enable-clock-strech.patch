@@ -1,0 +1,11 @@
+--- a/drivers/i2c/busses/i2c-mt7621.c
++++ b/drivers/i2c/busses/i2c-mt7621.c
+@@ -192,7 +192,7 @@ static void mtk_i2c_reset(struct mtk_i2c
+ 
+ 	/* ctrl0 */
+ 	reg = ODRAIN_HIGH_SM0 | VSYNC_PULSE | (i2c->clk_div << CLK_DIV_SHIFT) |
+-		WAIT_HIGH | SM0_EN;
++		WAIT_HIGH | SM0_EN | SCL_STRECH;
+ 	mtk_i2c_w32(i2c, reg, REG_SM0CTL0);
+ 
+ 	/* auto mode */
