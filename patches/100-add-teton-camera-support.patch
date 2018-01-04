@@ -193,7 +193,7 @@
 +		mtd-mac-address = <&factory 0x8004>;
 +		mediatek,mtd-eeprom = <&factory 0x8000>;
 +	};
-+}
++};
 +
 +&spi0 {
 +	status = "okay";
