@@ -55,6 +55,9 @@ MTK Properties --->
 	Drivers --->
 		<*> kmod-mt7610e
 		<*> kmod-mt7628
+
+Network --->
+	< > wpad-mini /* cancel wpad-mini package */
 ```  
 
 STEP 4  
