@@ -27,7 +27,7 @@ detect_mt7628() {
 	fi
 
 #	detect_ralink_wifi mt7628 mt7628
-	ssid=Meizu-R13-`eth_mac r wl0 | cut -c 12- | sed 's/://g'`
+	ssid="TETON-2.4G"
 	cd /sys/module/
 	[ -d $module ] || return
 	[ -e /etc/config/wireless ] && return

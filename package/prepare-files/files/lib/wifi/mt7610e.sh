@@ -26,7 +26,7 @@ detect_mt7610e() {
 	fi
 
 #	detect_ralink_wifi mt7610e mt7610e
-	ssid=Meizu-R13-5G-`eth_mac r wl1 | cut -c 12- | sed 's/://g'`
+	ssid="TETON-5G"
 	cd /sys/module
 	[ -d $module ] || return
         [ -e /etc/config/wireless ] && return
