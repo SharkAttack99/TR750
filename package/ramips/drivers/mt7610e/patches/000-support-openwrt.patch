@@ -1,0 +1,73 @@
+--- a/build/Makefile
++++ b/build/Makefile
+@@ -1,6 +1,6 @@
+-
++CONFIG_SUPPORT_OPENWRT=y
+ ifeq ($(CONFIG_SUPPORT_OPENWRT),y)
+-EXTRA_CFLAGS = -I$(src)/../src/include -I$(src)/../src/ate/include
++EXTRA_CFLAGS = -I$(src)/../src/include -I$(src)/../src/ate/include -DCONFIG_SUPPORT_OPENWRT -Wno-error=date-time
+ DRV_NAME = mt7610e
+ SRC_DIR = ../src
+ obj-m += $(DRV_NAME).o
+@@ -240,7 +240,7 @@ endif
+ 			-DSYSTEM_LOG_SUPPORT -DRESOURCE_PRE_ALLOC -DFPGA_MODE -DENHANCED_STAT_DISPLAY
+ 			EXTRA_CFLAGS += -DCONFIG_AP_SUPPORT  -DUAPSD_SUPPORT -DIAPP_SUPPORT -DDOT1X_SUPPORT -DAP_SCAN_SUPPORT -DSCAN_SUPPORT
+ #EXTRA_CFLAGS += -DRALINK_ATE -DCONFIG_RT2880_ATE_CMD_NEW -DRALINK_QA
+-EXTRA_CFLAGS += -DMT76x0 -DRT65xx -DMT7610 -DMT7630 -DMT7650 -DRLT_BBP -DRLT_MAC -DRLT_RF -DRTMP_MAC_PCI -DRTMP_PCI_SUPPORT -DA_BAND_SUPPORT -DRX_DMA_SCATTER -DRTMP_EFUSE_SUPPORT -DRA_NAT_SUPPORT -DCONFIG_ANDES_SUPPORT
++EXTRA_CFLAGS += -DMT76x0 -DRT65xx -DMT7610 -DMT7630 -DMT7650 -DRLT_BBP -DRLT_MAC -DRLT_RF -DRTMP_MAC_PCI -DRTMP_PCI_SUPPORT -DA_BAND_SUPPORT -DRX_DMA_SCATTER -DRTMP_EFUSE_SUPPORT -DRA_NAT_SUPPORT -DCONFIG_ANDES_SUPPORT -DCONFIG_RA_NAT_NONE
+ EXTRA_CFLAGS += -DVCORECAL_SUPPORT -DFIFO_EXT_SUPPORT
+ EXTRA_CFLAGS += -DMCS_LUT_SUPPORT -DPEER_DELBA_TX_ADAPT -DDYNAMIC_VGA_SUPPORT
+ #EXTRA_CFLAGS += -DDBG_DIAGNOSE -DDBG_RX_MCS -DDBG_TX_MCS
+--- a/src/include/video.h
++++ b/src/include/video.h
+@@ -8,5 +8,6 @@ UCHAR GetAsicDefaultTxBA(IN PRTMP_ADAPTE
+ UINT32 GetAsicVideoRetry(IN PRTMP_ADAPTER pAd);
+ UCHAR GetAsicVideoTxBA(IN PRTMP_ADAPTER pAd);
+ VOID VideoConfigInit(IN PRTMP_ADAPTER pAd);
++VOID VideoTurbineDynamicTune(IN PRTMP_ADAPTER pAd);
+ #endif /* VIDEO_TURBINE_SUPPORT */
+ 
+--- a/src/os/linux/rt_linux.c
++++ b/src/os/linux/rt_linux.c
+@@ -291,7 +291,7 @@ void RtmpFlashRead(
+ #ifdef RA_MTD_RW_BY_NUM
+ 	ra_mtd_read(MTD_NUM_FACTORY, 0, (size_t) b, p);
+ #else
+-	ra_mtd_read_nm("Factory", a&0xFFFF, (size_t) b, p);
++	ra_mtd_read_nm("factory", a&0xFFFF, (size_t) b, p);
+ #endif
+ #endif /* CONFIG_RALINK_FLASH_API */
+ }
+@@ -307,7 +307,7 @@ void RtmpFlashWrite(
+ #ifdef RA_MTD_RW_BY_NUM
+ 	ra_mtd_write(MTD_NUM_FACTORY, 0, (size_t) b, p);
+ #else
+-	ra_mtd_write_nm("Factory", a&0xFFFF, (size_t) b, p);
++	ra_mtd_write_nm("factory", a&0xFFFF, (size_t) b, p);
+ #endif
+ #endif /* CONFIG_RALINK_FLASH_API */
+ }
+@@ -878,8 +878,13 @@ void RtmpOSFileSeek(RTMP_OS_FD osfd, int
+ int RtmpOSFileRead(RTMP_OS_FD osfd, char *pDataPtr, int readLen)
+ {
+ 	/* The object must have a read method */
++	/* Modify by kyson<luoweilong@gl-inet.com> */
++#if 0
+ 	if (osfd->f_op && osfd->f_op->read) {
+ 		return osfd->f_op->read(osfd, pDataPtr, readLen, &osfd->f_pos);
++#endif
++	if (osfd->f_op) {
++		return __vfs_read(osfd, pDataPtr, readLen, &osfd->f_pos);
+ 	} else {
+ 		DBGPRINT(RT_DEBUG_ERROR, ("no file read method\n"));
+ 		return -1;
+@@ -888,7 +893,8 @@ int RtmpOSFileRead(RTMP_OS_FD osfd, char
+ 
+ int RtmpOSFileWrite(RTMP_OS_FD osfd, char *pDataPtr, int writeLen)
+ {
+-	return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
++	/* return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos); */
++	return __vfs_write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+ }
+ 
+ static inline void __RtmpOSFSInfoChange(OS_FS_INFO * pOSFSInfo, BOOLEAN bSet)
