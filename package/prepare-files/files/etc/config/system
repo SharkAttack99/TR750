@@ -15,7 +15,7 @@ config timeserver 'ntp'
 
 config led 'led_wifi_led'
         option name 'wifi'
-        option sysfs 'gl-mt300n-v2:green:wlan'
+        option sysfs 'gl-mt750-v2:green:wlan'
         option trigger 'netdev'
         option mode 'link tx rx'
         option dev 'ra0'
@@ -23,14 +23,14 @@ config led 'led_wifi_led'
 
 config led
         option name 'sd'
-        option sysfs 'gl-mt300n-v2:green:sd'
+        option sysfs 'gl-mt750-v2:green:sd'
         option default '1'
         option trigger 'mmc0'
 
 config led
         option default '0'
         option name 'usb'
-        option sysfs 'gl-mt300n-v2:green:usb'
+        option sysfs 'gl-mt750-v2:green:usb'
         option trigger 'usbport'
         list port 'usb1-port1'
         list port 'usb2-port1'
