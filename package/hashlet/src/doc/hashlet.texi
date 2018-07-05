@@ -1,0 +1,495 @@
+\input texinfo   @c -*-texinfo-*-
+@comment $Id@w{$}
+@comment %**start of header
+@setfilename hashlet.info
+@include version.texi
+@settitle Hashlet @value{VERSION}
+@syncodeindex pg cp
+@comment %**end of header
+@copying
+This manual is for Hashlet (version @value{VERSION}, @value{UPDATED}),
+which is a command line application for the Cryptotronix Hashlet.
+
+Copyright @copyright{} 2013 Cryptotronix, LLC.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+@end quotation
+@end copying
+
+@dircategory Texinfo documentation system
+@direntry
+* sample: (sample)Invoking sample.
+@end direntry
+
+@titlepage
+@title Hashlet
+@subtitle for version @value{VERSION}, @value{UPDATED}
+@author Josh Datko (@email{support@@cryptotronix.com})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top Hashlet
+
+This manual is for Hashlet (version @value{VERSION}, @value{UPDATED}).
+@end ifnottex
+
+@menu
+* Preface::
+* Hardware Overview::
+* Installation::
+* Invoking hashlet::
+* Key Slot Configuration::
+* GNU Free Documentation License::
+* Index::
+@end menu
+
+
+@node Preface
+@unnumbered Preface
+@pindex preface
+
+Welcome to the Cryptotronix Hashlet Manual!  This manual is meant for
+end users of the Hashlet, an authentication device designed for the
+@acronym{BBB, BeagleBone Black}.  It is expected that readers of this
+manual have some familiarity with the BBB and installing and running
+software on GNU/Linux platforms.
+
+@node Hardware Overview
+@chapter Hardware Overview
+
+The Hashlet device as shipped from Cryptotronix, is fully assembled and
+does not require any end-user assembly.  The mini-cape (capelet) is
+designed to sit on the P9 header of the BBB. @xref{fig:bbb}.  It uses
+pins P9_19 and P9_20 for the I2C protocol.  I2C test points are
+available on the Hashlet for convenient access and debugging.
+
+@float Figure,fig:bbb
+@image{hashlet_bbb,6in}
+@caption{Hashlet installed on a BBB using optional test points}
+@end float
+
+The @acronym{IC, Integrated Circuit} on the Hashlet is the Atmel
+ATSHA204@footnote{ATSHA204 Datasheet:
+@url{http://www.atmel.com/Images/Atmel-8740-CryptoAuth-ATSHA204-Datasheet.pdf}}.
+The key features of the ATSHA204 used by the Hashlet are:
+
+@itemize
+@item Hardware random number generator.
+@item Lockable configuration, @acronym{OTP, One Time Programmable}, and
+Data zones
+@item Slots for 16 keys (14 of which are user keys, 2 are test keys)
+@item Hardware @acronym{MAC, Message Authentication Code} using SHA256
+and internal data unique to the device.
+@item Hardware verification of MACs generated on the device.
+@end itemize
+
+The Hashlet, while designed for a BBB, is 5 Volt compatible and can be
+used on other platforms like a Raspberry Pi or Arduino.  However, the
+Hashlet software requires a GNU/Linux compatible operating system.
+
+@section Schematic
+
+The Hashlet requires only four supply lines.  @xref{fig:sch}.  On a
+BeagleBone Black, the P9 header supplies all the necessary inputs.  In
+their default configuration, pins P9_19 and P9_20 provide I2C data and
+clock, therefore no extra device tree files are needed to configure the
+pins.
+
+I2C test points are conveniently brought out to jumper J3 which provides
+access to the SDA, SCL, and GND lines.
+
+@float Figure,fig:sch
+@image{hashlet_sch,6in}
+@caption{Hashlet electrical schematic}
+@end float
+
+@node Installation
+@chapter Installation
+
+@section Hardware Installation
+
+The Hashlet ships fully assembled and tested.  Remove the device from
+the static-free bag and attached it to the P9 header of the BeagleBone
+Black. @xref{fig:bbb}.  Once attached, the device is ready for use.
+
+@section Software Installation
+
+The latest release for the software is available at
+@url{http://download.savannah.gnu.org/releases/hashlet/}.  The software
+was signed with a GPG key with a fingerprint of @footnote{full
+fingerprint @code{0xB5919B1AC7135905F4669C847BFA5031BD2EDEA6}}
+@code{BD2EDEA6} and matching email @email{jbd@@cryptotronix.com}, which you can download from a key server or from
+Savannah. @footnote{@url{https://savannah.nongnu.org/people/viewgpg.php?user_id=93382}.}
+
+
+After verification, run the typical commands, @command{./configure} and
+@command{make} to build the software.  However, to enable all of the
+features, you should firsts install @code{libgcrypt}.  Consult your
+operating system's package manager for documentation.  For Debian, one
+can install @code{libgcrypt} as follows: @kbd{sudo apt-get install
+libgcrypt11-dev}.  If @code{libgcrypt} is not installed,
+@command{configure} will produce a warning. @xref{lst:warning}.
+
+@float Listing,lst:warning
+@caption{Warning messages users can expect if @code{libgcrypt} is not installed}
+@code{@*
+   ----------------------------------------------------@*
+   Unable to find gcrypt.h on this system.@*
+   Some features are disabled, install libgcrypt and@*
+   rebuild to enable them.@*
+   ----------------------------------------------------}
+@end float
+
+@kindex state
+
+Once the software is built, one can install the software with @kbd{sudo
+make install}.  The default install location is
+@file{/usr/local/bin/hashlet}.  The hashlet is shipped in a
+@dfn{factory} state.  This means that unique keys have not yet been
+loaded and the device is not ready for cryptographic operation.
+
+Prior to running commands, you should add your user to the @code{i2c}
+group, otherwise you will need to run the commands as @samp{root}, which
+is not recommended.  The first command you should run to ensure that the
+device is working and is in the correct state is @kbd{hashlet state}.
+The response to this command should be @code{Factory}.  If it's not,
+contact Cryptotronix
+support@footnote{@email{support@@cryptotronix.com}}.
+
+The next command one should run is @kbd{hashlet personalize}.  This will
+configure the hashlet by populating the key slot configuration.
+@xref{Key Slot Configuration}.  It will also fill in random keys in key
+slots 0-13 and test keys in 14-15.  The test keys should not be used for
+production use.  Upon successful personalization, a backup of all keys
+will be written to @file{~/.hashlet} in un-encrypted form.  The command
+will silently complete on success, but if you want to ensure that it
+completed succesfuly, you can verify the exit code is 0 with @kbd{echo
+$?}.
+
+With a device now in the @dfn{personalized} state, the output of the
+@command{state} command should now be @code{Personalized}.  Also, if you
+return to the build directory, the @code{make check} target will now
+test the cryptographic operation of the device.
+
+Congratulations, you now have a personalized Hashlet!
+
+
+
+@node Invoking hashlet
+@chapter Invoking hashlet
+@pindex hashlet
+@cindex invoking @command{hashlet}
+
+The command @command{hashlet} requires one positional arguments, the
+@command{command}.  The command is the command to run.  Optional
+arguments may be supplied and may be relevant depending on the command.
+
+On a BeagleBone Black, the default I2C bus is @file{/dev/i2c-1} but can
+be changed with the @command{-b} option.
+
+@section State Transition Commands
+
+@strong{Caution:} The commands in this section permanently change the
+cryptographic state of the Hashlet from its Factory state.  This
+commands can @strong{not} be undone or reversed.
+
+@deffn Command personalize
+@kindex personalize
+
+The @command{personalize} performs the following operations:
+
+@itemize
+@item
+It writes to the configuration zone, which sorts meta-data about key
+use.
+
+@item
+It locks the configuration zone to prevent further writes to this zone.
+
+@item
+It writes to the One-Time Programmable zone, the software version in
+ASCII text in two 32 byte blocks, padded with zeros:
+
+@example
+CRYPTOTRONIX HASHLET REV: A
+SOFTWARE VERSION: @value{VERSION}
+@end example
+
+@item
+It loads the keys into the 16 key slots.  Currently random keys are
+loaded into the key slots, which are generated by the device.
+
+@item
+It locks the data zone.  The meta-data in the configuration now controls
+access to the key slots.  For example, if a key slot's configuration is
+set to write ALWAYS, then the key slot will be able to be read even
+after locking.
+
+@end itemize
+@end deffn
+@section Online Commands
+
+The following list of commands require the Hashlet to be physically
+attached to the bus in order to succeed.
+
+@deffn Command state
+@kindex state
+
+The @command{state} command returns the state of the device.  The three
+possible results of this command are @code{Factory}, @code{Initialized},
+and @code{Personalized}.
+
+@itemize
+@item @code{Factory}
+This is the device's initial state.  Unique keys have not yet been
+written to the device.
+@item @code{Initialized}
+This is an intermediate state that should not be encountered by users.
+The meaning of this state is that the configuration zone in the device
+has been locked, but the data and @dfn{One Time Programmable Zone}, has
+not.  Thus, key material in the device my be overwritten in this state.
+@item @code{Personalized}
+This is the final state and indicates that the device is ready for
+cryptographic operation.  The configuration and OTP zones may not be
+written to and the data slots may be accessed according to the
+configuration parameters. @xref{Key Slot Configuration}.
+
+@end itemize
+@end deffn
+
+@deffn Command serial-num
+@kindex @command{serial-num}
+
+This command returns the device's serial number.  Each device has a
+non-configurable serial number which is unique.  The serial number is
+always readable in any device state.
+@end deffn
+
+@deffn Command random @option{--update-seed}
+@kindex @command{random}
+
+This command returns 32 bytes of random data from the device.  Until the
+device is in the Personalized state, it will return a fixed pattern.
+The option, @option{--update-seed}, is available for this command.  When
+supplied, this command will also update the internal random seed on the
+device.  This need not be done frequently.
+@end deffn
+
+@deffn Command mac @option{--key-slot} @option{--file}
+@kindex @command{mac}
+
+This command calculates a SHA256 hash with external and internal data to
+produce a @acronym{Message Authentication Code, MAC}.  @xref{lst:mac}.
+The option, @option{--key-slot}, or @option{-k}, specifies which key to
+use in the calculation.  The input can either be provided by
+@command{stdin} or can be specified with the option, @option{--file}, or
+@option{-f}.  In either case, the input is hashed with SHA256 to produce
+a fixed 32 byte @dfn{challenge} to the device.  This calculation is
+performed in software by @command{libgcrypt}.
+
+@float Listing,lst:mac
+@caption{MAC calculation in Hashlet @value{VERSION}}
+@samp{SHA256 (Key | SHA256 (Input) | 0x08 | Mode Byte | Param2 | 00000000 |@*
+      000 | SN[8] | 0000 | SN[0:1] | SN[2:3])}
+@end float
+
+
+The response to this command, upon success, will be the following:
+
+@smallexample
+@code{
+mac       : C3466ABB8640B50938B260E17D86489D0EBB3F9C8009024683CB225FFFD3B4E4
+challenge : 9F0751C90770E6B40E34BA8E06EFE453FAA46B5FB26925FFBD664FAF951D000A
+meta      : 08000000000000000000000000}
+@end smallexample
+
+The @samp{mac} is the result of the calculation.  @samp{Challenge} is
+the SHA256 output of the input and @samp{meta} is associated meta data
+that must accompany the data.  The meta data is required as input into
+the @command{check-mac} operation. @footnote{See the
+@code{get_check_mac_meta_data} function for how the meta data is
+calculated}
+
+This entire response must be saved in order to verify the mac with the
+@command{check-mac} command.
+
+If @option{--key-slot} is not specified, key slot 0 is used.
+
+@end deffn
+
+@kindex @command{check-mac}
+
+@deffn Command check-mac @option{--challenge-response} @option{--challenge} @option{--meta-data}
+@code{check-mac} sends data to the device to test if
+@option{--challenge-response} was produced by @option{--challenge} and
+@option{--meta-data}.  The short versions of these options are
+@option{-r}, @option{-c}, and @option{-r} respectively.  For this
+command, these options are @dfn{required}.  These strings are the output
+from the @command{mac} command.
+
+Upon success, the command will exit silently with an exit code of 0.
+Otherwise, it will display an error and exit with 1.
+@end deffn
+
+@section Offline commands
+
+The following commands may be run without the Hashlet physically
+present.
+
+@kindex @command{offline-verify}
+@deffn Command offline-verify @option{--challenge-response} @option{--challenge} @option{--key-slot}
+
+@code{offline-verify} verifies a MAC produced by the Hashlet.  If
+@option{--key-slot} is not specified, key slot 0 is used.  The options,
+@option{--challenge-response} and @option{--challenge} are
+@dfn{required}.
+
+For this command to work, the backup key file must be located in
+@file{~/.hashlet}.  However, only the key slot used in the calculation
+need be included in that file, other key slot entries can be deleted.
+This calculation works using the fixed values from the @command{mac}
+command.  @xref{lst:mac}.  In future versions, more sophisticated
+options will be enabled.
+
+Upon success, the command will exit silently with an exit code of 0.
+Otherwise, it will display an error and exit with 1.
+@end deffn
+
+@node Key Slot Configuration
+@appendix Key Slot Configuration
+
+During the personalization process, the key usage fields are set in the
+configuration zone.  For each of the 16 data slots, there is a
+corresponding slot configuration that describes how that data slot is
+used. There are several attributes that control various aspects about
+the data slot.  @xref{tab:slot_config_settings}.
+
+@float Table,tab:slot_config_settings
+@table @samp
+@item ReadKey
+The corresponding slot that is used for encrypted reads.
+
+@item CheckOnly
+If set, this slot can only be used in CheckMac operations.
+
+@item SingleUse
+If set, this key slot has a limited amount of uses
+
+@item EncryptedRead
+If set, encrypted reads are required for this slot
+
+@item IsSecret
+If set, encrypted reads and writes are required for this slot
+
+@item WriteKey
+The slot of the key used for encrypted writes.
+
+@item DeriveKey
+If set, this slot may be written to with the Derive Key command
+
+@item WriteAlways
+If set, non-encrypted writes are always allowed
+
+@item WriteNever
+If set, writes are never permitted once the Data zone is locked
+
+@item WriteEncrypt
+If set, only encrypted writes are permitted.
+@end table
+@end float
+
+If @samp{IsSecret} is set and @samp{EncryptedRead} is not, the slot can
+never be read.  Likewise, if @samp{WriteNever} is set, the data slot can
+not be written.
+
+To alleviate the burden of the user from deciding how to configure their
+devices, Cryptotronix has picked the following
+defaults. @xref{tab:slot_config}.  These settings are set during
+personalization.  If a property is mentioned, it is set, otherwise it is
+off (not set).
+
+Keys 0-7 can be used for keyed hashing applications.  Keys 8-11 are
+reserved for password checking features.  Slots 12 and 13 allow write
+and read access and therefore are available for data storage.  Key
+storage in these slots is not recommended.  Key slots 14 and 15 are used
+as fixed test keys and can be read but not written after personalization.
+
+@float Table,tab:slot_config
+@table @samp
+@item Data Slot 0
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 1
+@samp{IsSecret}, @samp{WriteNever}, @samp{DeriveKey}
+
+@item Data Slot 2
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 3
+@samp{IsSecret}, @samp{WriteNever}, @samp{DeriveKey}
+
+@item Data Slot 4
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 5
+@samp{IsSecret}, @samp{WriteNever}, @samp{DeriveKey}
+
+@item Data Slot 6
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 7
+@samp{IsSecret}, @samp{WriteNever}, @samp{DeriveKey}
+
+@item Data Slot 8
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 9
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 10
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 11
+@samp{IsSecret}, @samp{WriteNever}
+
+@item Data Slot 12
+@samp{WriteAlways}
+
+@item Data Slot 13
+@samp{WriteAlways}
+
+@item Data Slot 14
+@samp{WriteNever}
+
+@item Data Slot 15
+@samp{WriteNever}
+
+
+@end table
+@end float
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+
+@include fdl.texi
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+@printindex ky
+
+@bye
