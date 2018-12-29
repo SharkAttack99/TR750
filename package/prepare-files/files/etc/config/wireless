@@ -28,7 +28,7 @@ config wifi-device 'mt7628'
 	option bw '1'
 	option country 'CN'
 	option region '1'
-	option ht_bsscoexist '1'
+	option ht_bsscoexist '0'
 	option autoch_skip '12;13'
 
 config wifi-iface 'mt7628iface'
