@@ -12,7 +12,8 @@
 #include <asm/unaligned.h>
 
 #define I2C_RETRY_CNT    3
-#define bq25890_I2C_ADDR   (0xD4 >> 1)
+// #define bq25890_I2C_ADDR   (0xD4 >> 1)
+#define bq25890_I2C_ADDR   (0xD6 >> 1)
 
 static DEFINE_MUTEX(battery_mutex);
 
@@ -157,6 +158,9 @@ static void bq25890_charger_hw_init(struct charger_device_info *di)
 
 	client->addr = bq25890_I2C_ADDR; 
 	*/
+	ret = bq_write_i2c_byte(di, 0x00, 0xc7);
+    mdelay(2);
+#if 0
 	ret = bq_write_i2c_byte(di, 0x00, 0x66);
     mdelay(2);
 	ret = bq_write_i2c_byte(di, 0x01, 0x0a);
@@ -173,7 +177,6 @@ static void bq25890_charger_hw_init(struct charger_device_info *di)
     mdelay(2);
 	ret = bq_write_i2c_byte(di, 0x07, 0x9d);
     mdelay(2);
-#if 0
 	ret = bq_write_i2c_byte(di, 0x09, 0xc4);
     mdelay(2);
 	ret = bq_write_i2c_byte(di, 0x0a, 0x74);

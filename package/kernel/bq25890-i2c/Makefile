@@ -17,7 +17,7 @@ define KernelPackage/bq25890-i2c
   SUBMENU:=Other modules
   TITLE:=I2C bq25890 Driver
   FILES:=$(PKG_BUILD_DIR)/bq25890-i2c.ko
-  AUTOLOAD:=$(call AutoLoad,75,bq25890-i2c)
+  # AUTOLOAD:=$(call AutoLoad,75,bq25890-i2c)
   KCONFIG:=
   DEPENDS:=kmod-i2c-core
 endef
