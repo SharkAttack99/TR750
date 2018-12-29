@@ -3,18 +3,18 @@
 power_led_state() {
         local state="$1"
         if [ "$state"x == "on"x ];then
-                echo 1 > /sys/class/leds/gl-mt300n-v2\:green\:power/brightness
+                echo 1 > /sys/class/leds/gl-mt750-v2\:green\:power/brightness
         else
-                echo 0 > /sys/class/leds/gl-mt300n-v2\:green\:power/brightness
+                echo 0 > /sys/class/leds/gl-mt750-v2\:green\:power/brightness
         fi
 }
 
 low_bat_led_state() {
         local state="$1"
         if [ "$state"x == "on"x ];then
-                echo 1 > /sys/class/leds/gl-mt300n-v2\:red\:low_bat/brightness
+                echo 1 > /sys/class/leds/gl-mt750-v2\:red\:low_bat/brightness
         else
-                echo 0 > /sys/class/leds/gl-mt300n-v2\:red\:low_bat/brightness
+                echo 0 > /sys/class/leds/gl-mt750-v2\:red\:low_bat/brightness
         fi
 }
 
@@ -40,7 +40,7 @@ while true;do
 
         if [ "$electricitybill_oct" -lt 8 ];then
                 led_revert
-                if [  "$electricitybill_oct" -lt 5 ];then
+                if [  "$electricitybill_oct" -gt 0 -a "$electricitybill_oct" -lt 5 ];then
                         /sbin/poweroff
                 fi
         fi
