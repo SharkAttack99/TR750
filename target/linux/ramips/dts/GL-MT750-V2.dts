@@ -109,9 +109,9 @@
 		reg = <0x55>;
 	};
 
-	bq25890@6a {
+	bq25890@6b {
 		compatible = "bq25890";
-		reg = <0x6a>;
+		reg = <0x6b>;
 	};
 };
 
