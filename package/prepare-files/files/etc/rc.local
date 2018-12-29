@@ -2,5 +2,6 @@
 # the system init finished. By default this file does nothing.
 
 /usr/bin/bat_monitor &
+/usr/bin/i2c_set &
 
 exit 0

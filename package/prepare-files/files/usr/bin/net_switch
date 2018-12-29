@@ -1,0 +1,29 @@
+#!/bin/sh
+
+print_usage() {
+	echo ""
+	echo "usage: net_switch <lan/wan>"
+	echo ""
+
+	exit 0
+}
+
+if [ "$#" -lt 1 ]; then
+	print_usage
+fi
+
+if [ "$1" = "lan" ]; then
+	uci set network.@switch_vlan[0].ports='0 6t'
+	uci set network.@switch_vlan[1].ports='1 6t'
+	uci commit network
+
+	swconfig dev switch0 load network
+elif [ "$1" = "wan" ]; then
+	uci set network.@switch_vlan[0].ports='1 6t'
+	uci set network.@switch_vlan[1].ports='0 6t'
+	uci commit network
+
+	swconfig dev switch0 load network
+else
+	print_usage
+fi
