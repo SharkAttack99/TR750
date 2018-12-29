@@ -28,6 +28,13 @@ config led
         option trigger 'mmc0'
 
 config led
+        option name 'wan'
+        option sysfs 'gl-mt750-v2:green:wan'
+        option default '0'
+        option trigger 'switch0'
+        option port_mask '0x01'
+
+config led
         option default '0'
         option name 'usb'
         option sysfs 'gl-mt750-v2:green:usb'

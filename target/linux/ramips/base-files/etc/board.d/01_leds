@@ -182,6 +182,7 @@ gl-mt750)
 	;;
 gl-mt750-v2)
 	set_wifi_led "$board:green:wlan" ra0
+	ucidef_set_led_switch "wan" "wan" "$board:green:wan" "switch0" "0x01"
 	;;
 hc5661)
 	ucidef_set_led_default "system" "system" "$board:blue:system" "1"
