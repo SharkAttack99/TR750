@@ -20,8 +20,13 @@ enable_mt7610e() {
 }
 
 detect_mt7610e() {
+	local device=`cat /proc/net/dev | grep rai0`
+	if [ -z "$device" ];then
+		return
+	fi
+
 #	detect_ralink_wifi mt7610e mt7610e
-	ssid=mt7610e-`ifconfig eth0 | grep HWaddr | cut -c 51- | sed 's/://g'`
+	ssid="TETON-5G"
 	cd /sys/module
 	[ -d $module ] || return
         [ -e /etc/config/wireless ] && return
@@ -31,20 +36,19 @@ config wifi-device      mt7610e
         option vendor   ralink
         option band     5G
         option channel  0
-		option autoch   2
+        option auotch   2
+        option bw       2
+        option ht_gi    1
+        option country  CN
+        option aregion  4
 
-config wifi-iface
+config wifi-iface	mt7610eiface
         option device   mt7610e
         option ifname   rai0
         option network  lan
         option mode     ap
         option ssid     $ssid
-        option encryption psk2
-        option key      12345678
+        option encryption none
 
 EOF
-
-
 }
-
-
