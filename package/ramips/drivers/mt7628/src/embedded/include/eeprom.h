@@ -74,7 +74,11 @@
 #define EEPROM_DEFAULT_FILE_PATH                     "/etc_ro/wlan/RT2880_RT2820_AP_2T3R_V1_6.bin"
 #ifdef MT7628
 #undef EEPROM_DEFAULT_FILE_PATH
+#if defined(CONFIG_SUPPORT_OPENWRT)
+#define EEPROM_DEFAULT_FILE_PATH					 "/etc/wireless/mt7628/mt7628.eeprom.bin"
+#else
 #define EEPROM_DEFAULT_FILE_PATH                     "/etc_ro/wlan/MT7628_EEPROM_20140317.bin"
+#endif
 #endif /* MT7628 */
 #endif /* EEPROM_DEFAULT_FILE_PATH */
 
