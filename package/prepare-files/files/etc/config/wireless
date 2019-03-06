@@ -7,7 +7,7 @@ config wifi-device 'mt7610e'
 	option bw '2'
 	option ht_gi '1'
 	option country 'CN'
-	option aregion '4'
+	option aregion '0'
 	option channel '149'
 
 config wifi-iface 'mt7610eiface'

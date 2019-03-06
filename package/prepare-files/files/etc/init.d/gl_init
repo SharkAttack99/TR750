@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+
+START=10
+
+fix_network() {
+	uci set network.lan.ipaddr="10.10.10.254"
+	uci commit network
+}
+
+start() {
+	fix_network
+
+	/etc/init.d/gl_init disable
+}
