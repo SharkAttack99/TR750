@@ -13,17 +13,27 @@ if [ "$#" -lt 1 ]; then
 fi
 
 if [ "$1" = "lan" ]; then
-	uci set network.@switch_vlan[0].ports='0 6t'
-	uci set network.@switch_vlan[1].ports='1 6t'
+	wan=$(uci -q get network.wan)
+	[ -n "$wan" ] && uci set network.wan.ifname=''
+
+	uci set network.lan.ifname='eth0'
+
 	uci commit network
 
-	swconfig dev switch0 load network
+	/etc/init.d/network restart
 elif [ "$1" = "wan" ]; then
-	uci set network.@switch_vlan[0].ports='1 6t'
-	uci set network.@switch_vlan[1].ports='0 6t'
+	wan=$(uci -q get network.wan)
+	[ -n "$wan" ] && {
+		uci set network.wan=interface
+		uci set network.wan.proto='dhcp'
+	}
+
+	uci set network.lan.ifname=''
+	uci set network.wan.ifname='eth0'
+
 	uci commit network
 
-	swconfig dev switch0 load network
+	/etc/init.d/network restart
 else
 	print_usage
 fi
