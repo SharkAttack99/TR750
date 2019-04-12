@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+start() {
+	local led=$(find /sys/class/leds/ -name "*sd*" 2>/dev/null)
+	local mmc=$(find /sys/bus/mmc/devices -name "*mmc*" 2>/dev/null)
+
+	[ -n "$mmc" -a -n "$led" ] && {
+		# Turn on the LED of SD card
+		echo 0 > "$led/brightness"
+		echo "mmc0" > "$led/trigger"
+	}
+}
